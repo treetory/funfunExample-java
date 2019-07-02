@@ -1,2 +1,16 @@
-apply plugin: "idea"
-apply plugin: "java"
+plugins {
+    id 'java'
+}
+
+group 'funfunExample-java'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
