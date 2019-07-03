@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration>
+<configuration scan="true" scanPeriod="30 seconds">
+    
+    <!-- 화면용 -->
+	<appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>%date{MM-dd HH:mm:ss.SSS}|%-5level|%thread|%throwable{4}%logger{0}.%M\(%line\)::%msg %n</pattern>
+		</encoder>
+	</appender>
+
+    <logger name="io.funfun.redbook">
+        <level value="DEBUG" />
+    </logger>
+
+    <root>
+		<appender-ref ref="consoleAppender" />
+	</root>
+	
+</configuration>

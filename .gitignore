@@ -2,5 +2,7 @@
 .idea/**/*
 .settings/**/*
 /out/**/*
+.vscode/**/*
+/bin/**/*
 .classpath
 .project

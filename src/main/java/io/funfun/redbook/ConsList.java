@@ -1,9 +1,14 @@
 package io.funfun.redbook;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public abstract class ConsList<T> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ConsList.class);
 
     T head;
     ConsList<T> tail;
@@ -26,8 +31,10 @@ public abstract class ConsList<T> {
 
     public <R> ConsList<R> map(ConsList<R> acc, Function<T, R> mapper) {
         if (this instanceof Nil) {
+            LOG.debug("head : {}, tail : {}, acc : {}", this.head, this.tail, acc);
             return acc;
         } else {
+            LOG.debug("head : {}, tail : {}, acc : {}", this.head, this.tail, acc);
             return this.tail.map(new Cons<R>(mapper.apply(this.head), acc), mapper);
         }
         //return isEmpty() ? acc : this.tail.map(new Cons<R>(mapper.apply(this.head), acc), mapper);
@@ -46,7 +53,6 @@ public abstract class ConsList<T> {
             }
             return this.tail.filter(temp, predicate);
         }
-
         //return (this instanceof Nil) ? acc : (predicate.test(this.head) ? new Cons<T>(this.head, acc) : this.tail.filter(acc, predicate));
     }
 
