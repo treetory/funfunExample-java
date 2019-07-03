@@ -24,10 +24,11 @@ public abstract class ConsList<T> {
     public ConsList<T> tail() {
         return tail;
     }
-
+    /*
     public boolean isEmpty() {
         return (this instanceof Nil) ? true : false;
     }
+    */
 
     public <R> ConsList<R> map(ConsList<R> acc, Function<T, R> mapper) {
         if (this instanceof Nil) {
@@ -57,7 +58,12 @@ public abstract class ConsList<T> {
     }
 
     public ConsList<T> flatMap(ConsList<T> acc, Function<ConsList<T>, ConsList<T>> mapper) {
-        return isEmpty() ? acc : mapper.apply(this.tail);
+        if (this instanceof Nil) {
+            return acc;
+        } else {
+            ConsList temp = new Cons<>(this.head, mapper.apply(acc));
+            return temp;
+        }
     }
 
     @Override

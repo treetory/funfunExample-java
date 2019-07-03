@@ -7,8 +7,9 @@ public class Cons<T> extends ConsList<T> {
         this.tail = tail;
     }
 
+    /*
     public static <T> Cons<T> cons(T head, ConsList<T> tail) {
         return new Cons<>(head, tail);
     }
-
+    */
 }

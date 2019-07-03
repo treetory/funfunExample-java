@@ -25,7 +25,7 @@ public class Nil<T> extends ConsList<T> {
     }
 
     public ConsList<T> tail() {
-        throw new UnsupportedOperationException("empty");
+        throw new UnsupportedOperationException("tail of empty list");
     }
 
 }
