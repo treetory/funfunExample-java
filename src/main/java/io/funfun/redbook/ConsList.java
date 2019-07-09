@@ -3,10 +3,11 @@ package io.funfun.redbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public abstract class ConsList<T> {
+public abstract class ConsList<T> extends AbstractList<T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ConsList.class);
 
@@ -24,21 +25,15 @@ public abstract class ConsList<T> {
     public ConsList<T> tail() {
         return tail;
     }
-    /*
-    public boolean isEmpty() {
-        return (this instanceof Nil) ? true : false;
-    }
-    */
 
     public <R> ConsList<R> map(ConsList<R> acc, Function<T, R> mapper) {
         if (this instanceof Nil) {
-            LOG.debug("head : {}, tail : {}, acc : {}", this.head, this.tail, acc);
+            //LOG.debug("head : {}, tail : {}, acc : {}", this.head, this.tail, acc);
             return acc;
         } else {
-            LOG.debug("head : {}, tail : {}, acc : {}", this.head, this.tail, acc);
-            return this.tail.map(new Cons<R>(mapper.apply(this.head), acc), mapper);
+            //LOG.debug("head : {}, tail : {}, acc : {}", this.head, this.tail, acc);
+            return this.tail.map(new Cons<>(mapper.apply(this.head), acc), mapper);
         }
-        //return isEmpty() ? acc : this.tail.map(new Cons<R>(mapper.apply(this.head), acc), mapper);
     }
 
     public ConsList<T> filter(ConsList<T> acc, Predicate<T> predicate) {
@@ -48,22 +43,39 @@ public abstract class ConsList<T> {
         } else {
             ConsList<T> temp;
             if (predicate.test(this.head)) {
-                temp = new Cons<T>(this.head, acc);
+                temp = new Cons<>(this.head, acc);
             } else {
                 temp = acc;
             }
             return this.tail.filter(temp, predicate);
         }
-        //return (this instanceof Nil) ? acc : (predicate.test(this.head) ? new Cons<T>(this.head, acc) : this.tail.filter(acc, predicate));
     }
 
-    public ConsList<T> flatMap(ConsList<T> acc, Function<ConsList<T>, ConsList<T>> mapper) {
+    public <R> ConsList<R> flatMap(ConsList<R> acc, Function<T, ? extends Iterable<R>> mapper) {
+
         if (this instanceof Nil) {
             return acc;
         } else {
-            ConsList temp = new Cons<>(this.head, mapper.apply(acc));
-            return temp;
+
+            Iterator<R> ir = (mapper.apply(this.head)).iterator();
+
+            while(ir.hasNext()) {
+
+                R cur = ir.next();
+
+                //LOG.debug("{}, {}, {}", cur, acc.head, acc.tail);
+
+                if (acc instanceof Nil) {
+                    acc = new Cons<>(cur, Nil.getNil());
+                } else {
+                    ConsList<R> temp = acc;
+                    acc = new Cons<>(cur, temp);
+                }
+            }
+
+            return this.tail.flatMap(acc, mapper);
         }
+
     }
 
     @Override

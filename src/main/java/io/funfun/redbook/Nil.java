@@ -28,4 +28,13 @@ public class Nil<T> extends ConsList<T> {
         throw new UnsupportedOperationException("tail of empty list");
     }
 
+    @Override
+    public T get(int index) {
+        return (T) getNil();
+    }
+
+    @Override
+    public int size() {
+        return 0;
+    }
 }
