@@ -26,10 +26,20 @@ public abstract class ConsList<T> extends AbstractList<T> {
         return tail;
     }
 
+    public ConsList<T> reverse(ConsList<T> acc) {
+        if (this instanceof  Nil) {
+            return acc;
+        } else {
+            ConsList<T> temp = acc;
+            acc = new Cons<>(this.head, temp);
+            return this.tail.reverse(acc);
+        }
+    }
+
     public <R> ConsList<R> map(ConsList<R> acc, Function<T, R> mapper) {
         if (this instanceof Nil) {
             //LOG.debug("head : {}, tail : {}, acc : {}", this.head, this.tail, acc);
-            return acc;
+            return acc.reverse(Nil.getNil());
         } else {
             //LOG.debug("head : {}, tail : {}, acc : {}", this.head, this.tail, acc);
             return this.tail.map(new Cons<>(mapper.apply(this.head), acc), mapper);
@@ -39,7 +49,7 @@ public abstract class ConsList<T> extends AbstractList<T> {
     public ConsList<T> filter(ConsList<T> acc, Predicate<T> predicate) {
 
         if (this instanceof Nil) {
-            return acc;
+            return acc.reverse(Nil.getNil());
         } else {
             ConsList<T> temp;
             if (predicate.test(this.head)) {
@@ -54,7 +64,7 @@ public abstract class ConsList<T> extends AbstractList<T> {
     public <R> ConsList<R> flatMap(ConsList<R> acc, Function<T, ? extends Iterable<R>> mapper) {
 
         if (this instanceof Nil) {
-            return acc;
+            return acc.reverse(Nil.getNil());
         } else {
 
             Iterator<R> ir = (mapper.apply(this.head)).iterator();
