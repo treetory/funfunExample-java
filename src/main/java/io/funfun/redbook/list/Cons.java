@@ -1,4 +1,4 @@
-package io.funfun.redbook;
+package io.funfun.redbook.list;
 
 public class Cons<T> extends ConsList<T> {
 

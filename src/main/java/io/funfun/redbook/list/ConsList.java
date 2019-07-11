@@ -1,4 +1,4 @@
-package io.funfun.redbook;
+package io.funfun.redbook.list;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +26,17 @@ public abstract class ConsList<T> extends AbstractList<T> {
         return tail;
     }
 
+    public static <T> ConsList<T> asList(T... a) {
+
+        ConsList<T> temp = Nil.getNil();
+
+        for (T t : a) {
+            temp = new Cons<>(t, temp);
+        }
+
+        return temp;
+    }
+
     public ConsList<T> reverse(ConsList<T> acc) {
         if (this instanceof  Nil) {
             return acc;
@@ -33,6 +44,21 @@ public abstract class ConsList<T> extends AbstractList<T> {
             ConsList<T> temp = acc;
             acc = new Cons<>(this.head, temp);
             return this.tail.reverse(acc);
+        }
+    }
+
+    public ConsList<T> addHead(ConsList<T> item) {
+        //LOG.debug("{} : {}", item.head, this);
+        return new Cons<>(item.head, this);
+    }
+
+    public ConsList<T> drop(int count) {
+        if (count == 0) {
+            return this;
+        } else {
+            int cnt = count;
+            cnt--;
+            return this.tail.drop(cnt--);
         }
     }
 
@@ -61,6 +87,7 @@ public abstract class ConsList<T> extends AbstractList<T> {
         }
     }
 
+    // fold, flatten, append
     public <R> ConsList<R> flatMap(ConsList<R> acc, Function<T, ? extends Iterable<R>> mapper) {
 
         if (this instanceof Nil) {
@@ -86,6 +113,41 @@ public abstract class ConsList<T> extends AbstractList<T> {
             return this.tail.flatMap(acc, mapper);
         }
 
+    }
+
+    public <R> ConsList<R> split(ConsList<R> acc, String delimeter) {
+        if (this instanceof Nil) {
+            return acc;
+        } else {
+            LOG.debug("{} : {}", this.head, this.tail);
+            return this.tail.split(acc, delimeter);
+        }
+    }
+
+    public <R> ConsList<R> flatMap2(ConsList<R> acc, Function<T, ? extends AbstractList<R>> mapper) {
+        if (this instanceof Nil) {
+            return acc.reverse(Nil.getNil());
+        } else {
+            List<R> mapped = (mapper.apply(this.head));
+            //LOG.debug("cur : {}", mapped);
+            //LOG.debug("before : {}", acc);
+            acc = ((ConsList<R>) mapped).reverse(Nil.getNil()).append(acc);
+            //LOG.debug("after  : {}", acc);
+            return this.tail.flatMap2(acc, mapper);
+        }
+    }
+
+    private ConsList<T> append(ConsList<T> acc/*, ConsList<T> item*/) {
+        if (this instanceof Nil) {
+            return acc;
+        } else {
+            ConsList<T> temp = acc;
+            //LOG.debug("{}", this.head);
+            temp = new Cons<>(this.head, acc);
+            acc = temp;
+        }
+        //LOG.debug("{}", acc);
+        return this.tail.append(acc);
     }
 
     @Override
