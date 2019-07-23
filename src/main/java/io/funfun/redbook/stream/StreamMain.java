@@ -9,5 +9,10 @@ public class StreamMain {
 
     public static void main(String[] args) {
 
+        Stream<String> before = Stream.of("AAA", "BBB", "CCC")
+                .filter(Nil.getNil(), s -> !s.equals("CCC"))
+                .filter(Nil.getNil(), s -> !s.equals("BBB"));
+        LOG.debug("{}{}", System.lineSeparator(), before.toString());
+
     }
 }
