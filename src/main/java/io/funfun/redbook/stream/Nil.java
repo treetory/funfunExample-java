@@ -21,7 +21,7 @@ public class Nil<T> extends Stream<T> {
     }
 
     @Override
-    public Lazy<Stream<T>> tail() {
+    public Stream<T> tail() {
         throw new UnsupportedOperationException("tail of empty stream");
     }
 }

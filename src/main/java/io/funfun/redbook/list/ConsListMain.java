@@ -1,17 +1,14 @@
-package io.funfun.redbook;
+package io.funfun.redbook.list;
 
-import io.funfun.redbook.list.Cons;
-import io.funfun.redbook.list.ConsList;
-import io.funfun.redbook.list.Nil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-public class Main {
+public class ConsListMain {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Main.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ConsListMain.class);
 
     public static void main(String[] args) {
 

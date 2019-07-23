@@ -15,8 +15,8 @@ public class Cons<T> extends Stream<T> {
     }
 
     @Override
-    public Lazy<Stream<T>> tail() {
-        return this.tail;
+    public Stream<T> tail() {
+        return this.tail.get();
     }
 
 }

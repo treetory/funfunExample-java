@@ -1,4 +1,4 @@
-package io.funfun.redbook;
+package io.funfun.redbook.option;
 
 import java.util.NoSuchElementException;
 import java.util.function.Function;
