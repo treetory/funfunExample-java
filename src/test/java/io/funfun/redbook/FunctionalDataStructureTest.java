@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import io.funfun.redbook.list.Cons;
 import io.funfun.redbook.list.ConsList;
 import io.funfun.redbook.list.Nil;
+import io.funfun.redbook.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -90,4 +91,50 @@ public class FunctionalDataStructureTest {
         );
     }
 
+    @Test
+    @DisplayName("[ConsList] : foldLeft")
+    void foldLeftConsList() {
+        ConsList<Integer> consList = new Cons<Integer>(1, new Cons(2, new Cons(3, new Cons(4, Nil.getNil()))));
+        ConsList<Integer> leftFolded = consList.foldLeft(Nil.getNil());
+        assertNotSame(consList, leftFolded);
+        assertIterableEquals(consList, leftFolded.addHead(new Cons<>(1, Nil.getNil())));
+    }
+
+    @Test
+    @DisplayName("[ConsList] : foldRight")
+    void foldRightConsList() {
+        ConsList<Integer> consList = new Cons<Integer>(1, new Cons(2, new Cons(3, new Cons(4, Nil.getNil()))));
+        ConsList<Integer> rightFolded = consList.foldRight(Nil.getNil());
+        assertNotSame(consList, rightFolded);
+        assertIterableEquals(rightFolded, new Cons<>(1, new Cons<>(2, new Cons<>(3, Nil.getNil()))));
+    }
+
+    @Test
+    @DisplayName("[ConsList] : length")
+    void lengthConsList() {
+        ConsList<Integer> consList = ConsList.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+        int length = consList.length(0);
+        assertEquals(10, length);
+    }
+
+    @Test
+    @DisplayName("[Stream] : making Stream")
+    void createStream() {
+        Stream<String> stringStream = Stream.of("AAA", "BBB", "CCC");
+        ConsList<String> consList = ConsList.asList("AAA", "BBB", "CCC");
+
+        assertEquals(stringStream.head(), consList.head());
+    }
+
+    @Test
+    @DisplayName("[Stream] : filter")
+    void filterStream() {
+        Stream<String> stringStream = Stream.of("AAA", "BBB", "CCC");
+        ConsList<String> consList = ConsList.asList("AAA", "BBB", "CCC");
+
+        assertEquals(
+                stringStream.filter(io.funfun.redbook.stream.Nil.getNil(), s -> "AAA".equals(s)).head(),
+                consList.filter(Nil.getNil(), s -> "AAA".equals(s)).head()
+                );
+    }
 }

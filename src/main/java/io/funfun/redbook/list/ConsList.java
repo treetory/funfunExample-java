@@ -149,6 +149,38 @@ public abstract class ConsList<T> extends AbstractList<T> {
         return this.tail.append(acc);
     }
 
+    // head 를 접어서 남은 tail 을 return 하는 것으로 구현 -> reverse 하면서 전체 리스트 한번 순회
+    public ConsList<T> foldLeft(ConsList<T> acc) {
+        if (this instanceof Nil) {
+            return acc.reverse(Nil.getNil());
+        } else {
+            acc = this.tail();
+            return acc;
+        }
+    }
+
+    // tail 이 Nil 이면, head 를 acc 에 담지 않는 방식으로 구현 -> tail 이 Nil 일 때까지 한번 가고, reverse 하면서 한번 더 순회
+    public ConsList<T> foldRight(ConsList<T> acc) {
+        ConsList<T> temp = acc;
+        if (this.tail() instanceof Nil) {
+            return acc.reverse(Nil.getNil());
+        } else {
+            temp = new Cons<>(this.head, acc);
+            return this.tail.foldRight(temp);
+        }
+    }
+
+    // 전체 순회하면서 각 head 의 값이 있을 때, count 를 늘리는 방식으로 구현
+    public int length(int acc) {
+        if (this instanceof Nil) {
+            return acc;
+        } else {
+            int temp = acc;
+            ++temp;
+            return this.tail.length(temp);
+        }
+    }
+
     @Override
     public String toString() {
         return "ConsList{" +
