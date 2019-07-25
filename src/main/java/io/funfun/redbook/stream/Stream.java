@@ -3,11 +3,7 @@ package io.funfun.redbook.stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Array;
-import java.util.AbstractList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -27,6 +23,7 @@ public abstract class Stream<T> implements Iterable<T> {
     }
 
     // 여러 elements 를 받아서 Stream<T> 객체를 생성
+    @SafeVarargs
     public static <T> Stream<T> of (T... elements) {
         Stream<T> stream = Nil.getNil();
         for (T element : elements) {
@@ -47,7 +44,7 @@ public abstract class Stream<T> implements Iterable<T> {
             //LOG.debug(">>> tail : {}", this.tail());
             Stream<T> temp = acc;
             if (predicate.test(this.head)) {
-                acc = new Cons<T>(this.head, () -> this.tail().filter(temp, predicate));
+                acc = new Cons<>(this.head, () -> this.tail().filter(temp, predicate));
                 //LOG.debug(">>> true : {}", acc.head);
             }
             return this.tail().filter(acc, predicate);
@@ -96,7 +93,7 @@ public abstract class Stream<T> implements Iterable<T> {
 
     // head 를 접고 남은 tail 을 return 하도록 처리
     public Stream<T> foldLeft(Stream<T> acc) {
-        LOG.debug("{}>>> acc : {}", acc);
+        //LOG.debug("{}>>> acc : {}", acc);
         if (this instanceof Nil) {
             return acc.reverse(Nil.getNil());
         } else {
@@ -107,12 +104,12 @@ public abstract class Stream<T> implements Iterable<T> {
 
     // tail 이 Nil 이면, head 를 acc 에 담지 않는 방식으로 구현 -> tail 이 Nil 일 때까지 한번 가고, reverse 하면서 한번 더 순회
     public Stream<T> foldRight(Stream<T> acc) {
-        Stream<T> temp = acc;
+        final Stream<T> temp = acc;
         if (this.tail() instanceof Nil) {
             return acc.reverse(Nil.getNil());
         } else {
-            temp = new Cons<>(this.head, () -> acc);
-            return this.tail().foldRight(temp);
+            acc = new Cons<>(this.head, () -> temp);
+            return this.tail().foldRight(acc);
         }
     }
 
@@ -162,8 +159,8 @@ public abstract class Stream<T> implements Iterable<T> {
         } else {
             final Stream<T> temp = acc;
             acc = new Cons<>(this.head, () -> temp);
-            LOG.debug("{}>>> acc.head() : {}", System.lineSeparator(), acc.head());
-            LOG.debug("{}>>> acc.tail().head() : {}", System.lineSeparator(), (acc.tail() instanceof Nil) == false ? acc.tail().head() : "empty");
+            //LOG.debug("{}>>> acc.head() : {}", System.lineSeparator(), acc.head());
+            //LOG.debug("{}>>> acc.tail().head() : {}", System.lineSeparator(), (acc.tail() instanceof Nil) == false ? acc.tail().head() : "empty");
             return this.tail().append(acc);
         }
     }
