@@ -139,6 +139,7 @@ public abstract class Stream<T> implements Iterable<T> {
         }
     }
 
+    // ConsList 의 flatMap2 와 비슷한 방법으로 구현했다. -> 근데 Iterable 을 확장하지 아니하고선 Function 넘겨받을 때, 처리할 방법이 생각이 안난다...
     public <R> Stream<R> flatMap(Stream<R> acc, Function<T, ? extends Iterable<R>> mapper) {
         if (this instanceof Nil) {
             return acc.reverse(Nil.getNil());
