@@ -35,7 +35,7 @@ public abstract class ConsList<T> extends AbstractList<T> {
             temp = new Cons<>(t, temp);
         }
 
-        return temp;
+        return temp.reverse(Nil.getNil());
     }
 
     // 순서 뒤집기
@@ -129,7 +129,7 @@ public abstract class ConsList<T> extends AbstractList<T> {
             List<R> mapped = (mapper.apply(this.head));
             //LOG.debug("cur : {}", mapped);
             //LOG.debug("before : {}", acc);
-            acc = ((ConsList<R>) mapped).reverse(Nil.getNil()).append(acc);
+            acc = ((ConsList<R>) mapped).append(acc);
             //LOG.debug("after  : {}", acc);
             return this.tail.flatMap2(acc, mapper);
         }
