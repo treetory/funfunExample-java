@@ -2,6 +2,7 @@ package io.funfun.redbook.reference;
 
 import java.util.NoSuchElementException;
 
+// 요것은... 스터디 시작했을 때, 찬호님께 가이드 받았던... 이렇게 구현하면 될 것 같다고 했던 샘플 코드임...
 public abstract class FPList<T> {
 
     static final FPList NONE = new None();

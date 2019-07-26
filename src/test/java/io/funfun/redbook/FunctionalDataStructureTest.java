@@ -308,4 +308,5 @@ public class FunctionalDataStructureTest {
         Option<Integer> integerOption = io.funfun.redbook.option.Nil.getNil();
         assertEquals(integerOption.getOrElse(), io.funfun.redbook.option.Nil.getNil());
     }
+
 }
