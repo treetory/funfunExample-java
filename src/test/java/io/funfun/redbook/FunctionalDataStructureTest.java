@@ -4,14 +4,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import io.funfun.redbook.list.Cons;
 import io.funfun.redbook.list.ConsList;
+import io.funfun.redbook.option.Option;
 import io.funfun.redbook.stream.Nil;
 import io.funfun.redbook.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
 public class FunctionalDataStructureTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(FunctionalDataStructureTest.class);
 
     @Test
     @DisplayName("[ConsList] : making list")
@@ -252,5 +257,55 @@ public class FunctionalDataStructureTest {
         assertEquals(mapped.tail().tail().tail().tail().head(), "cuckoo's");
         assertEquals(mapped.tail().tail().tail().tail().tail().head(), "nest");
         assertEquals(mapped.tail().tail().tail().tail().tail().tail().head(), "To");
+    }
+
+    @Test
+    @DisplayName("[Option] : of")
+    void ofOption() {
+        Option<String> stringOption = Option.of("AAA");
+        //LOG.debug("{}", stringOption.get().toString());
+        assertEquals(stringOption.toString(), "AAA");
+
+        Option<Integer> integerOption = Option.of(1);
+        assertEquals(integerOption.toString(), String.valueOf(1));
+
+        Option<Float> floatOption = Option.of(1f);
+        assertEquals(floatOption.toString(), String.valueOf(1f));
+
+        Option<Long> longOption = Option.of(1L);
+        assertEquals(longOption.toString(), String.valueOf(1L));
+
+        //byte[] arr = "AAA".getBytes();
+        //Option<byte[]> byteOption = Option.of(arr);
+        //assertEquals(arr, byteOption.get());
+        // [B@55a1c291 -> [B@55a1c291 로 같은데... 왜 assertEqual 은 FailedError 를 주는 걸까...
+    }
+
+    @Test
+    @DisplayName("[Option] : filter")
+    void filterOption() {
+        Option<String> stringOption = Option.of("AAA");
+        Option<String> filtered1 = stringOption.filter(s -> "AAA".equals(s));
+        assertEquals(filtered1.get().toString(), "AAA");
+        Option<String> filtered2 = stringOption.filter(s -> !"AAA".equals(s));
+        assertEquals(filtered2.get(), io.funfun.redbook.option.Nil.getNil());
+    }
+
+    @Test
+    @DisplayName("[Option] : map")
+    void mapOption() {
+        Option<Integer> integerOption = Option.of(1);
+        Option<Integer> mapped = integerOption.map(integer -> integer + 2);
+        assertEquals(mapped.get().toString(), "3");
+    }
+
+    @Test
+    @DisplayName("[Option] : getOrElse")
+    void getOrElseOption() {
+        Option<String> stringOption = Option.of("AAA");
+        assertEquals(stringOption.getOrElse(), stringOption);
+
+        Option<Integer> integerOption = io.funfun.redbook.option.Nil.getNil();
+        assertEquals(integerOption.getOrElse(), io.funfun.redbook.option.Nil.getNil());
     }
 }

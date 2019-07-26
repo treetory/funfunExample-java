@@ -1,4 +1,4 @@
-package io.funfun.redbook.list;
+package io.funfun.redbook.reference;
 
 import java.util.NoSuchElementException;
 
