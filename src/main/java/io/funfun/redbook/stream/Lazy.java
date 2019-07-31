@@ -16,6 +16,16 @@ public final class Lazy<T> implements Supplier<T>{
         this.supplier = supplier;
     }
 
+    // 2019-07-30 리뷰 결과 : head 도 Lazy 가 적용되어 있어야 한다고 한다. 그래서 head 에 Lazy 를 적용해 줄 수 있도록, T 타입의 인자를 받았을 때, 해당 객체에 Lazy 를 적용해줄 수 있는 생성자를 두었다.
+    private Lazy(T value) {
+        this.value = value;
+    }
+
+    public static <T> Lazy<T> of(T element) {
+        Objects.requireNonNull(element);
+        return new Lazy<>(element);
+    }
+
     public static <T> Lazy<T> of(Supplier<T> supplier) {
         Objects.requireNonNull(supplier);
         if (supplier instanceof Lazy) {

@@ -7,13 +7,17 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+// TODO 2019-07-30 Iterable 을 implement 하는 것을 빼는 것이 좋겠다는 의견을 받음
+// TODO 2019-07-30 Nil 을 항상 acc 의 인자로 넘기지 않도록, 편의함수를 제공하는 것이 좋겠다는 의견을 받음
 public abstract class Stream<T> implements Iterable<T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(Stream.class);
 
-    T head;
+    // head 도 lazy 가 적용되어야 한다 -> Lazy 가 적용되지 않으면, eager valuation 이 발생한다.
+    Lazy<T> head;
     Lazy<Stream<T>> tail;
 
+    // 그러므로 head() 함수도 tail() 처럼 평가된 값을 return 하도록 get() 을 실행하여 반환하도록 한다.
     public abstract T head();
     public abstract Stream<T> tail();
 
@@ -43,8 +47,8 @@ public abstract class Stream<T> implements Iterable<T> {
             //LOG.debug(">>> head : {}", this.head);
             //LOG.debug(">>> tail : {}", this.tail());
             Stream<T> temp = acc;
-            if (predicate.test(this.head)) {
-                acc = new Cons<>(this.head, () -> this.tail().filter(temp, predicate));
+            if (predicate.test(this.head())) {
+                acc = new Cons<>(this.head(), () -> this.tail().filter(temp, predicate));
                 //LOG.debug(">>> true : {}", acc.head);
             }
             return this.tail().filter(acc, predicate);
@@ -108,7 +112,7 @@ public abstract class Stream<T> implements Iterable<T> {
         if (this.tail() instanceof Nil) {
             return acc.reverse(Nil.getNil());
         } else {
-            acc = new Cons<>(this.head, () -> temp);
+            acc = new Cons<>(this.head(), () -> temp);
             return this.tail().foldRight(acc);
         }
     }
@@ -122,7 +126,7 @@ public abstract class Stream<T> implements Iterable<T> {
             }
             return temp.reverse(Nil.getNil());
         } else {
-            temp = new Cons<>(this.head, () -> acc);
+            temp = new Cons<>(this.head(), () -> acc);
             return this.tail().append(temp, element);
         }
     }
@@ -132,7 +136,7 @@ public abstract class Stream<T> implements Iterable<T> {
         if (this instanceof Nil) {
             return acc.reverse(Nil.getNil());
         } else {
-            return this.tail().map(new Cons<>(mapper.apply(this.head), () -> acc), mapper);
+            return this.tail().map(new Cons<>(mapper.apply(this.head()), () -> acc), mapper);
         }
     }
 
@@ -147,10 +151,17 @@ public abstract class Stream<T> implements Iterable<T> {
             // 2. 상기 결과를 Stream 으로 변환 후에
             // 3. acc 에 해당 결과를 append 한다.
             // 4. 해당 결과를 reverse 처리한 것을 acc 에 옮겨 담은 후에, 꼬리 재귀 시킨다.
-            Stream<R> result = ((Stream<R>) Stream.of(((List<R>) mapper.apply(this.head)).toArray())).append(temp);
+            Stream<R> result = ((Stream<R>) Stream.of(((List<R>) mapper.apply(this.head())).toArray())).append(temp);
             return this.tail().flatMap(result.reverse(Nil.getNil()), mapper);
         }
     }
+
+    // TODO 2019-07-30 map 을 적용 후, flatten 을 적용하는 방식으로 flatMap 을 구현해보는 것이 좋겠다는 리뷰결과가 있다.
+    /*
+    public <R> Stream<R> flatMap(Stream<R> acc, Function<T, R> mapper) {
+        return Nil.getNil();
+    }
+    */
 
     // flatMap 을 위해선 이게 필요했다... -> stream 을 acc 에 append 하는 것만 처리, 위의 append 는 Stream 에 추가하고자 하는 원소 하나를 붙이는 함수...
     private Stream<T> append(Stream<T> acc) {
@@ -158,7 +169,7 @@ public abstract class Stream<T> implements Iterable<T> {
             return acc.reverse(Nil.getNil());
         } else {
             final Stream<T> temp = acc;
-            acc = new Cons<>(this.head, () -> temp);
+            acc = new Cons<>(this.head(), () -> temp);
             //LOG.debug("{}>>> acc.head() : {}", System.lineSeparator(), acc.head());
             //LOG.debug("{}>>> acc.tail().head() : {}", System.lineSeparator(), (acc.tail() instanceof Nil) == false ? acc.tail().head() : "empty");
             return this.tail().append(acc);

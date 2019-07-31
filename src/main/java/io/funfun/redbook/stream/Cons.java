@@ -6,14 +6,14 @@ import java.util.function.Supplier;
 
 public class Cons<T> extends Stream<T> {
 
-    public Cons(T head, Supplier<Stream<T>> tail) {
-        this.head = head;
+    public Cons(T head/*Supplier<T> head*/, Supplier<Stream<T>> tail) {
+        this.head = Lazy.of(head);
         this.tail = Lazy.of(tail);
     }
 
     @Override
     public T head() {
-        return this.head;
+        return this.head.get();
     }
 
     @Override
