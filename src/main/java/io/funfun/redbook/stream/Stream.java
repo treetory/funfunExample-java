@@ -37,6 +37,7 @@ public abstract class Stream<T> implements Iterable<T> {
         return stream.reverse(Nil.getNil());
     }
 
+    // TODO 2019-07-30 리뷰 : filter 의 동작도 개선되는게 좋지 않을까...? 규하님(foldRight), 찬호님 구현 코드 참조할 것
     // predicate 평가식을 받아서 그 평가식의 결과에 해당하는 것들로 이뤄진 Stream<T> 반환
     public Stream<T> filter(Stream<T> acc, Predicate<T> predicate) {
 
