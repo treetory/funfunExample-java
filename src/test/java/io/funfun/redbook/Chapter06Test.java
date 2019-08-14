@@ -3,12 +3,15 @@ package io.funfun.redbook;
 import io.funfun.redbook.state.RNG;
 import io.funfun.redbook.state.SimpleRNG;
 import org.javatuples.Pair;
+import org.javatuples.Quartet;
+import org.javatuples.Triplet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -40,10 +43,22 @@ public class Chapter06Test {
 
         assertEquals(pair2.getValue0(), pair3.getValue0());
         assertEquals(((RNG)pair2.getValue1()).getSeed(), ((RNG)pair3.getValue1()).getSeed());
+
+        // 이것은 반복 테스트, 10000번 실험
+        Pair<BigInteger, RNG> pair = null;
+        for (int i=0; i<10000; i++) {
+            if (pair == null) {
+                pair = rng.nextInt();
+            } else {
+                pair = pair.getValue1().nextInt();
+            }
+            LOG.debug("{} ---> {} : {}", pair.getValue0(), pair.getValue1().getSeed(), (pair.getValue0()).intValue() >= 0 ? true : false);
+        }
+
     }
 
     @Test
-    @DisplayName("[State] : Simple Random Number Generator")
+    @DisplayName("[State] : None Negative Random Integer Number")
     void testNonNegativeInt() {
         // 난수 발생기를 생성
         // 샘플 10000개 돌려봄
@@ -60,4 +75,48 @@ public class Chapter06Test {
 
     }
 
+    @Test
+    @DisplayName("[State] : Random Double Number")
+    void testNextDouble() {
+        // 난수 발생기를 생성
+        // 샘플 10000개 돌려봄
+        RNG rng = new SimpleRNG(42L);
+        Pair<Double, RNG> pair = null;
+        for (int i=0; i<10000; i++) {
+            if (pair == null) {
+                pair = rng.nextDouble();
+            } else {
+                pair = pair.getValue1().nextDouble();
+            }
+            Pair<Double, RNG> finalPair = pair;
+            assertTrue(() -> {
+                return (finalPair.getValue0() instanceof Double);
+            });
+            LOG.debug("{} ---> {} : {}", pair.getValue0(), pair.getValue1().getSeed(), (pair.getValue0()).intValue() >= 0 ? true : false);
+        }
+    }
+
+    @Test
+    @DisplayName("[State] : IntDouble")
+    void testNextIntDouble() {
+        RNG rng = new SimpleRNG(42L);
+        Triplet<BigInteger, Double, RNG> n = rng.nextIntDouble();
+        LOG.debug("{} ---> {} : {}", n.getValue0(), n.getValue1(), n.getValue2().getSeed());
+    }
+
+    @Test
+    @DisplayName("[State] : DoubleInt")
+    void testNextDoubleInt() {
+        RNG rng = new SimpleRNG(42L);
+        Triplet<Double, BigInteger, RNG> n = rng.nextDoubleInt();
+        LOG.debug("{} ---> {} : {}", n.getValue0(), n.getValue1(), n.getValue2().getSeed());
+    }
+
+    @Test
+    @DisplayName("[State] : Double3")
+    void testNextDouble3() {
+        RNG rng = new SimpleRNG(42L);
+        Quartet<Double, Double, Double, RNG> n = rng.nextDouble3();
+        LOG.debug("{} ---> {} --->  {} : {}", n.getValue0(), n.getValue1(), n.getValue2(), n.getValue3().getSeed());
+    }
 }
