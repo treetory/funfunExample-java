@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Random;
+import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -46,17 +46,16 @@ public class Chapter06Test {
     @DisplayName("[State] : Simple Random Number Generator")
     void testNonNegativeInt() {
         // 난수 발생기를 생성
-        // 샘플 1000개 돌려봄
+        // 샘플 10000개 돌려봄
         RNG rng = new SimpleRNG(42L);
-        Pair<Integer, RNG> pair = null;
-        for (int i=0; i<1000; i++) {
+        Pair<BigInteger, RNG> pair = null;
+        for (int i=0; i<10000; i++) {
             if (pair == null) {
                 pair = rng.nonNegativeInt();
             } else {
                 pair = pair.getValue1().nonNegativeInt();
             }
-            LOG.debug("{} ---> {}", pair.getValue0(), pair.getValue1().getSeed());
-            //assertTrue(pair.getValue0() >= 0 && pair.getValue0() <= Integer.MAX_VALUE );
+            LOG.debug("{} ---> {} : {}", pair.getValue0(), pair.getValue1().getSeed(), (pair.getValue0()).intValue() >= 0 ? true : false);
         }
 
     }

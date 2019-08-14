@@ -13,7 +13,7 @@ public abstract class RNG {
     }
 
     // 목록 6.2 순수 함수적 난수 발생기
-    public abstract Pair<Integer, RNG> nextInt();
+    public abstract Pair<BigInteger , RNG> nextInt();
     // 연습문제 6.1
-    public abstract Pair<Integer, RNG> nonNegativeInt();
+    public abstract Pair<BigInteger , RNG> nonNegativeInt();
 }
