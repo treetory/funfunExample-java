@@ -5,6 +5,7 @@ import org.javatuples.Quartet;
 import org.javatuples.Triplet;
 
 import java.math.BigInteger;
+import java.util.List;
 
 public abstract class RNG {
 
@@ -24,5 +25,7 @@ public abstract class RNG {
     public abstract Triplet<BigInteger, Double, RNG> nextIntDouble();
     public abstract Triplet<Double, BigInteger, RNG> nextDoubleInt();
     public abstract Quartet<Double, Double, Double, RNG> nextDouble3();
+    // 연습문제 6.4
+    public abstract List<Pair<BigInteger, RNG>> nextIntList(int count);
 
 }

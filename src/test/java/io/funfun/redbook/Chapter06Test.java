@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -119,4 +120,15 @@ public class Chapter06Test {
         Quartet<Double, Double, Double, RNG> n = rng.nextDouble3();
         LOG.debug("{} ---> {} --->  {} : {}", n.getValue0(), n.getValue1(), n.getValue2(), n.getValue3().getSeed());
     }
+
+    @Test
+    @DisplayName("[State] : Random Integer List")
+    void testNextIntList() {
+        int count = 5000;
+        RNG rng = new SimpleRNG(42L);
+        List<Pair<BigInteger, RNG>> result = rng.nextIntList(count);
+        result.stream().forEach(objects -> LOG.debug("{}{} ---> {}", System.lineSeparator(), objects.getValue0(), objects.getValue1().getSeed()));
+        assertEquals(count, result.size());
+    }
+
 }

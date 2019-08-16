@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SimpleRNG extends RNG {
 
@@ -75,34 +77,65 @@ public class SimpleRNG extends RNG {
     }
 
     /**
+     *  Triplet 의 결과를 반환하는 것이 목표
      *
-     *
-     * @return
+     * @return  Triplet<BigInteger, Double, RNG> (난수는 2가지 타입의 난수, 발생기는 하나)
      */
     @Override
     public Triplet<BigInteger, Double, RNG> nextIntDouble() {
-        Pair<BigInteger, RNG> _int = this.nextInt();
-        Pair<Double, RNG> _double = this.nextDouble();
+        Pair<BigInteger, RNG> first = this.nextInt();
+        Pair<Double, RNG> second = first.getValue1().nextDouble();
 
-        LOG.debug("{}{} ---> {} : {}", System.lineSeparator(), _int.getValue1().getSeed(), _double.getValue1().getSeed(), Math.subtractExact(_int.getValue1().getSeed(), _double.getValue1().getSeed()));
+        LOG.debug("{}{} ---> {} : {}", System.lineSeparator(), first.getValue1().getSeed(), second.getValue1().getSeed(), Math.subtractExact(first.getValue1().getSeed(), second.getValue1().getSeed()));
 
-        return Triplet.with(_int.getValue0(), _double.getValue0(), _int.getValue1());
+        return Triplet.with(first.getValue0(), second.getValue0(), second.getValue1());
     }
 
+    /**
+     *  Triplet 의 결과를 반환하는 것이 목표
+     *
+     * @return  Triplet<Double, BigInteger, RNG> (난수는 2가지 타입의 난수, 발생기는 하나)
+     */
     @Override
     public Triplet<Double, BigInteger, RNG> nextDoubleInt() {
-        Pair<BigInteger, RNG> _int = this.nextInt();
-        Pair<Double, RNG> _double = this.nextDouble();
+        Pair<Double, RNG> first = this.nextDouble();
+        Pair<BigInteger, RNG> second = first.getValue1().nextInt();
 
-        LOG.debug("{}{} ---> {} : {}", System.lineSeparator(), _int.getValue1().getSeed(), _double.getValue1().getSeed(), Math.subtractExact(_int.getValue1().getSeed(), _double.getValue1().getSeed()));
+        LOG.debug("{}{} ---> {} : {}", System.lineSeparator(), first.getValue1().getSeed(), second.getValue1().getSeed(), Math.subtractExact(first.getValue1().getSeed(), second.getValue1().getSeed()));
 
-        return Triplet.with(_double.getValue0(), _int.getValue0(), _int.getValue1());
+        return Triplet.with(first.getValue0(), second.getValue0(), second.getValue1());
     }
 
+    /**
+     *  Quartet 의 결과를 반환하는 것이 목표
+     *
+     * @return  Quartet<Double, Double, Double, RNG> (난수는 3가지 타입의 난수, 발생기는 하나)
+     */
     @Override
     public Quartet<Double, Double, Double, RNG> nextDouble3() {
-        Pair<Double, RNG> _double = this.nextDouble();
-        return Quartet.with(_double.getValue0(), _double.getValue0(), _double.getValue0(), _double.getValue1());
+        Pair<Double, RNG> first = this.nextDouble();
+        Pair<Double, RNG> second = first.getValue1().nextDouble();
+        Pair<Double, RNG> third = second.getValue1().nextDouble();
+        return Quartet.with(first.getValue0(), second.getValue0(), third.getValue0(), third.getValue1());
+    }
+
+    /**
+     * 직전에 생성했던 난수로부터 반환된 발생기를 이용하여 난수를 계속 생성
+     *
+     * @param   count (난수 생성할 개수)
+     * @return  List<Pair<BigInteger, RNG>> (난수를 발생시킨 결과의 목록, 목록의 개수는 count 와 같다)
+     */
+    @Override
+    public List<Pair<BigInteger, RNG>> nextIntList(int count) {
+        List<Pair<BigInteger, RNG>> list = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            if (i == 0) {
+                list.add(this.nextInt());
+            } else {
+                list.add(list.get(i-1).getValue1().nextInt());
+            }
+        }
+        return list;
     }
 
 
