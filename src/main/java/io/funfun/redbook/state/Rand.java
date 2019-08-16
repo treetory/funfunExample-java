@@ -1,6 +1,5 @@
 package io.funfun.redbook.state;
 
-import javafx.util.converter.BigIntegerStringConverter;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
