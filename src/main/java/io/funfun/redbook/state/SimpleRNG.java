@@ -49,7 +49,7 @@ public class SimpleRNG extends RNG {
      * @return  Pair<BigInteger, RNG> (튜플을 반환한다. 튜플은 난수(양의 정수)와 난수생성기를 가지고 있다.)
      */
     @Override
-    public Pair<BigInteger , RNG> nonNegativeInt() {
+    public Pair<BigInteger, RNG> nonNegativeInt() {
         Pair<BigInteger, RNG> n = this.nextInt();
         //LOG.debug("{}{} ---> {}", System.lineSeparator(), n.getValue0(), n.getValue1().getSeed());
         BigInteger rn = n.getValue0();

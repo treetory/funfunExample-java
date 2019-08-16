@@ -1,6 +1,7 @@
 package io.funfun.redbook;
 
 import io.funfun.redbook.state.RNG;
+import io.funfun.redbook.state.Rand;
 import io.funfun.redbook.state.SimpleRNG;
 import org.javatuples.Pair;
 import org.javatuples.Quartet;
@@ -131,4 +132,66 @@ public class Chapter06Test {
         assertEquals(count, result.size());
     }
 
+    @Test
+    @DisplayName("[State] : Rand & Unit")
+    void testUnit() {
+        Rand<Integer, RNG> rand1 = new Rand<>();
+        rand1.unit(15);
+        //LOG.debug("{}{} --->  {}", System.lineSeparator(), rand1.getNumber(), rand1.getRng().getSeed());
+        Rand<Integer, RNG> rand2 = new Rand<>();
+        rand2.unit(35);
+        //LOG.debug("{}{} --->  {}", System.lineSeparator(), rand2.getNumber(), rand2.getRng().getSeed());
+
+        // unit 은 인자로 넘겨준 숫자와 난수발생기만 반환해야 한다.
+        // 15를 넘기면 Rand 에 15가 입력되어야 한다.
+        assertEquals(rand1.getNumber(), 15);
+        // 35를 넘기면 Rand 에 35가 입력되어야 한다.
+        assertEquals(rand2.getNumber(), 35);
+        // rand1 과 rand2 모두 순수함수적인 RNG 를 이용하므로, 같은 seed 값을 가지고 있어야 한다.
+        assertEquals(rand1.getRng().getSeed(), rand2.getRng().getSeed());
+    }
+
+    @Test
+    @DisplayName("[State] : Rand & Map")
+    void testMap() {
+        Rand<Integer, RNG> rand = new Rand<>();
+        rand.unit(15);
+        LOG.debug("{}{} --->  {}", System.lineSeparator(), rand.getNumber(), rand.getRng().getSeed());
+        Rand<Integer, RNG> _rand1 = rand.map(integer -> integer *2);
+        LOG.debug("{}{} --->  {}", System.lineSeparator(), _rand1.getNumber(), _rand1.getRng().getSeed());
+        Rand<Integer, RNG> _rand2 = _rand1.map(integer -> integer - 1);
+        LOG.debug("{}{} --->  {}", System.lineSeparator(), _rand2.getNumber(), _rand2.getRng().getSeed());
+    }
+
+    @Test
+    @DisplayName("[State] : Rand & Map with None Negative Integer")
+    void testNonNegativeEven() {
+        Rand<BigInteger, RNG> rand = new Rand<>();
+        rand.unit(BigInteger.valueOf(16L));
+
+        Rand<BigInteger, RNG> rand1 = rand.nonNegativeEven();
+        LOG.debug("{}{} --->  {}", System.lineSeparator(), rand1.getNumber(), rand1.getRng().getSeed());
+        assertTrue((rand1.getNumber().divideAndRemainder(BigInteger.valueOf(2L))[1]).intValueExact() == 0);
+
+        Rand<BigInteger, RNG> rand2 = rand1.nonNegativeEven();
+        LOG.debug("{}{} --->  {}", System.lineSeparator(), rand2.getNumber(), rand2.getRng().getSeed());
+        assertTrue((rand2.getNumber().divideAndRemainder(BigInteger.valueOf(2L))[1]).intValueExact() == 0);
+
+        Rand<BigInteger, RNG> rand3 = rand2.nonNegativeEven();
+        LOG.debug("{}{} --->  {}", System.lineSeparator(), rand3.getNumber(), rand3.getRng().getSeed());
+        assertTrue((rand3.getNumber().divideAndRemainder(BigInteger.valueOf(2L))[1]).intValueExact() == 0);
+
+        Rand<BigInteger, RNG> rand4 = rand3.nonNegativeEven();
+        LOG.debug("{}{} --->  {}", System.lineSeparator(), rand4.getNumber(), rand4.getRng().getSeed());
+        assertTrue((rand4.getNumber().divideAndRemainder(BigInteger.valueOf(2L))[1]).intValueExact() == 0);
+
+        Rand<BigInteger, RNG> rand5 = rand4.nonNegativeEven();
+        LOG.debug("{}{} --->  {}", System.lineSeparator(), rand5.getNumber(), rand5.getRng().getSeed());
+        assertTrue((rand5.getNumber().divideAndRemainder(BigInteger.valueOf(2L))[1]).intValueExact() == 0);
+
+        Rand<BigInteger, RNG> rand6 = rand5.nonNegativeEven();
+        LOG.debug("{}{} --->  {}", System.lineSeparator(), rand6.getNumber(), rand6.getRng().getSeed());
+        assertTrue((rand6.getNumber().divideAndRemainder(BigInteger.valueOf(2L))[1]).intValueExact() == 0);
+
+    }
 }
