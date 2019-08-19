@@ -144,5 +144,4 @@ public class SimpleRNG<T> extends RNG<T> {
         return list;
     }
 
-
 }

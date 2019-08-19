@@ -154,12 +154,12 @@ public class Chapter06Test {
     @Test
     @DisplayName("[State] : Rand & Map")
     void testMap() {
-        Rand<Integer, RNG> rand = new Rand<>();
-        rand.unit(15);
+        Rand<BigInteger, RNG> rand = new Rand<BigInteger, RNG>();
+        //rand.unit(15);
         LOG.debug("{}{} --->  {}", System.lineSeparator(), rand.getNumber(), rand.getRng().getSeed());
-        Rand<Integer, RNG> _rand1 = rand.map(integer -> integer *2);
+        Rand<BigInteger, RNG> _rand1 = rand.map(bigInteger -> BigInteger.valueOf(bigInteger.intValueExact() *2));
         LOG.debug("{}{} --->  {}", System.lineSeparator(), _rand1.getNumber(), _rand1.getRng().getSeed());
-        Rand<Integer, RNG> _rand2 = _rand1.map(integer -> integer - 1);
+        Rand<BigInteger, RNG> _rand2 = _rand1.map(bigInteger -> BigInteger.valueOf(bigInteger.intValueExact() - 1));
         LOG.debug("{}{} --->  {}", System.lineSeparator(), _rand2.getNumber(), _rand2.getRng().getSeed());
     }
 
@@ -167,7 +167,7 @@ public class Chapter06Test {
     @DisplayName("[State] : Rand & Map with None Negative Integer")
     void testNonNegativeEven() {
         Rand<BigInteger, RNG> rand = new Rand<>();
-        rand.unit(BigInteger.valueOf(16L));
+        //rand.unit(BigInteger.valueOf(16L));
 
         Rand<BigInteger, RNG> rand1 = rand.nonNegativeEven();
         LOG.debug("{}{} --->  {}", System.lineSeparator(), rand1.getNumber(), rand1.getRng().getSeed());
@@ -202,5 +202,16 @@ public class Chapter06Test {
         Rand<Double, RNG> _rand = rand.nextDouble();
         LOG.debug("{}{} --->  {}", System.lineSeparator(), _rand.getNumber(), _rand.getRng().getSeed());
         assertTrue(_rand.getNumber() instanceof Double);
+    }
+
+    @Test
+    @DisplayName("[State] : Rand & Map2")
+    void testMap2() {
+        Rand<?, RNG> randA = new Rand<>();
+        Rand<?, RNG> randB = new Rand<>(Double.valueOf("19293829"));
+        Rand<Float, RNG> randC = (Rand<Float, RNG>) randA.map2(randB, (i, i2) -> {
+            return ((BigInteger) i).multiply((BigInteger) i2);
+        });
+        LOG.debug("{}{} ---> {}", System.lineSeparator(), randC.getNumber(), randC.getRng().getSeed());
     }
 }
