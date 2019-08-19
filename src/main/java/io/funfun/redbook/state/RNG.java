@@ -7,7 +7,7 @@ import org.javatuples.Triplet;
 import java.math.BigInteger;
 import java.util.List;
 
-public abstract class RNG {
+public abstract class RNG<T> {
 
     Long seed;
 
@@ -15,6 +15,7 @@ public abstract class RNG {
         return this.seed;
     }
 
+    public abstract Pair<T, SimpleRNG> next();
     // 목록 6.2 순수 함수적 난수 발생기
     public abstract Pair<BigInteger, RNG> nextInt();
     // 연습문제 6.1

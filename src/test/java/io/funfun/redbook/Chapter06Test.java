@@ -194,4 +194,13 @@ public class Chapter06Test {
         assertTrue((rand6.getNumber().divideAndRemainder(BigInteger.valueOf(2L))[1]).intValueExact() == 0);
 
     }
+
+    @Test
+    @DisplayName("[State] : Rand & Map to get double")
+    void testRandNextDouble() {
+        Rand<Double, RNG> rand = new Rand<>();
+        Rand<Double, RNG> _rand = rand.nextDouble();
+        LOG.debug("{}{} --->  {}", System.lineSeparator(), _rand.getNumber(), _rand.getRng().getSeed());
+        assertTrue(_rand.getNumber() instanceof Double);
+    }
 }

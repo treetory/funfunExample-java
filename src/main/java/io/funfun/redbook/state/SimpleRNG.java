@@ -10,7 +10,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimpleRNG extends RNG {
+public class SimpleRNG<T> extends RNG<T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(SimpleRNG.class);
 
@@ -21,6 +21,12 @@ public class SimpleRNG extends RNG {
     private static final long multiplier = 0x5DEECE66DL;
     private static final long addend = 0xBL;
     private static final long mask = (1L << 48) - 1;
+
+    @Override
+    public Pair<T, SimpleRNG> next() {
+        Long newSeed = (seed * multiplier + addend) & mask;
+        return (Pair<T, SimpleRNG>) Pair.with(BigInteger.valueOf(newSeed >>> 16), new SimpleRNG(newSeed));
+    }
 
     /**
      * integer overflow 때문에 rng 에서 생성하는 난수를 BigInteger 자료형으로 변경하였다.

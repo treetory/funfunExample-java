@@ -12,7 +12,7 @@ public class Rand<T, RNG> {
     public static final Logger LOG = LoggerFactory.getLogger(Rand.class);
 
     private T number;
-    private RNG rng;
+    private SimpleRNG rng;
 
     private final Long init_seed = 19283920L;
 
@@ -20,12 +20,12 @@ public class Rand<T, RNG> {
         return number;
     }
 
-    public RNG getRng() {
+    public SimpleRNG getRng() {
         return rng;
     }
 
     public Rand() {
-        this.rng = (RNG) new SimpleRNG(init_seed);
+        this.rng = new SimpleRNG(init_seed);
     }
 
     /**
@@ -66,8 +66,26 @@ public class Rand<T, RNG> {
     public Rand<T, RNG> nonNegativeEven() {
         Pair<BigInteger, io.funfun.redbook.state.RNG> nonNegativeInt = ((SimpleRNG)this.getRng()).nonNegativeInt();
         this.number = (T) nonNegativeInt.getValue0();
-        this.rng = (RNG) nonNegativeInt.getValue1();
+        this.rng = (SimpleRNG) nonNegativeInt.getValue1();
         return this.map(t -> (T) ((BigInteger)t).subtract((nonNegativeInt.getValue0()).divideAndRemainder(BigInteger.valueOf(2L))[1]));
+    }
+
+    // 연습문제 6.5
+
+    /**
+     * map 을 이용하여 double 타입의 난수를 반환하는 함수를 구현
+     * TODO 이 또한 위와 마찬가지로... 타입 추론을 이용하면 코드가 더 깨끗해질 것인지...
+     *
+     * @return  Rand<Double, RNG> (난수는 Double 자료형)
+     */
+    public Rand<Double, RNG> nextDouble() {
+        Pair<T, SimpleRNG> _next = this.getRng().next();
+        this.number = _next.getValue0();
+        this.rng = _next.getValue1();
+        return (Rand<Double, RNG>) this.map(t -> {
+            LOG.debug("{}{} ---> {}", System.lineSeparator(), this.getNumber(), this.getRng().getSeed());
+            return (T) Double.valueOf(((BigInteger)this.getNumber()).doubleValue());
+        });
     }
 
 }
