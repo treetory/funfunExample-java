@@ -1,5 +1,6 @@
 package io.funfun.redbook;
 
+import io.funfun.redbook.list.ConsList;
 import io.funfun.redbook.state.RNG;
 import io.funfun.redbook.state.Rand;
 import io.funfun.redbook.state.SimpleRNG;
@@ -207,11 +208,42 @@ public class Chapter06Test {
     @Test
     @DisplayName("[State] : Rand & Map2")
     void testMap2() {
-        Rand<?, RNG> randA = new Rand<>();
-        Rand<?, RNG> randB = new Rand<>(Double.valueOf("19293829"));
-        Rand<Float, RNG> randC = (Rand<Float, RNG>) randA.map2(randB, (i, i2) -> {
-            return ((BigInteger) i).multiply((BigInteger) i2);
-        });
+        Rand<BigInteger, RNG> randA = new Rand<>();
+        Rand<Double, RNG> randB = new Rand<>(Double.valueOf("19293829"));
+        Rand<Float, RNG> randC = (Rand<Float, RNG>) randA.map2(randB, (i, i2) -> i.multiply(i2));
         LOG.debug("{}{} ---> {}", System.lineSeparator(), randC.getNumber(), randC.getRng().getSeed());
+    }
+
+    @Test
+    @DisplayName("[State] : Rand & Map2 to get both A & B")
+    void testBoth() {
+        Rand<BigInteger, RNG> randA = new Rand<>();
+        Rand<Double, RNG> randB = new Rand<>(Double.valueOf("19293829"));
+        Rand<Pair<BigInteger, BigInteger>, RNG> _both = randA.both(new Rand<>(BigInteger.valueOf(Math.round(randB.getNumber()))));
+        LOG.debug("{}{} ---> {} : {}", System.lineSeparator(), _both.getNumber().getValue0(), _both.getNumber().getValue1(), _both.getRng().getSeed());
+    }
+
+    @Test
+    @DisplayName("[State] : Rand & Both to BigInteger & Double random number")
+    void testRandIntDouble() {
+        Rand<BigInteger, RNG> randA = new Rand<>();
+        Rand<Pair<BigInteger, Double>, RNG> _both = randA.randIntDouble();
+        LOG.debug("{}{} ---> {} : {}", System.lineSeparator(), _both.getNumber().getValue0(), _both.getNumber().getValue1(), _both.getRng().getSeed());
+    }
+
+    @Test
+    @DisplayName("[State] : Rand & Both to Double & BigInteger random number")
+    void testRandDoubleInt() {
+        Rand<Double, RNG> randA = new Rand<>(Double.valueOf("19293829"));
+        Rand<Pair<Double, BigInteger>, RNG> _both = randA.randDoubleInt();
+        LOG.debug("{}{} ---> {} : {}", System.lineSeparator(), _both.getNumber().getValue0(), _both.getNumber().getValue1(), _both.getRng().getSeed());
+    }
+
+    @Test
+    @DisplayName("[State] : Rand & Sequence")
+    void testSequence() {
+        Rand<Double, RNG> randA = new Rand<>(Double.valueOf("19293829"));
+        Rand<ConsList<Double>, RNG> seq = randA.sequence(ConsList.asList(1d, 2d, 3d, 4d, 5d, 6d));
+        LOG.debug("{}{} ---> {}", System.lineSeparator(), seq.getNumber(), seq.getRng().getSeed());
     }
 }

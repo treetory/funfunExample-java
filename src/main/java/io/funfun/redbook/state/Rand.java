@@ -1,10 +1,14 @@
 package io.funfun.redbook.state;
 
+import io.funfun.redbook.list.Cons;
+import io.funfun.redbook.list.ConsList;
+import io.funfun.redbook.list.Nil;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -83,6 +87,18 @@ public class Rand<T extends Object, RNG> {
         return this.map(t -> (T) ((BigInteger)t).subtract((nonNegativeInt.getValue0()).divideAndRemainder(BigInteger.valueOf(2L))[1]));
     }
 
+    public Rand<T, RNG> next() {
+        Pair<T, SimpleRNG> _next = this.getRng().next();
+        this.number = _next.getValue0();
+        this.rng = _next.getValue1();
+        return this;
+    }
+
+    public Rand<BigInteger, RNG> nextInt() {
+        this.next();
+        return (Rand<BigInteger, RNG>) this;
+    }
+
     // 연습문제 6.5
     /**
      * map 을 이용하여 double 타입의 난수를 반환하는 함수를 구현
@@ -91,17 +107,14 @@ public class Rand<T extends Object, RNG> {
      * @return  Rand<Double, RNG> (난수는 Double 자료형)
      */
     public Rand<Double, RNG> nextDouble() {
-        Pair<T, SimpleRNG> _next = this.getRng().next();
-        this.number = _next.getValue0();
-        this.rng = _next.getValue1();
+        this.next();
         return (Rand<Double, RNG>) this.map(t -> (T) Double.valueOf(((BigInteger)this.getNumber()).doubleValue()));
     }
 
     // 연습문제 6.6
-
     /**
      * 연산을 하려면, 타입을 엄격하게 맞춰야 하는 것 때문에 코드가 지저분해지는 것 같다...
-     * RandA 와 RandB 를 받아서 새로운 타입의 난수를 가진 RandC 를 반환하는 함수를 만드는 데,
+     * RandA(this) 와 RandB(rb) 를 받아서 새로운 타입의 난수를 가진 RandC 를 반환하는 함수를 만드는 데,
      * java 에서 제공하는 FunctionalInterface 가 BiFunction 이 있어서 이것을 활용했다.
      * 만약 더 많은 인자를 받아서 처리해야 하면, FunctionalInterface 를 추가로 만들어서 쓰면된다.
      * -> <see>https://stackoverflow.com/questions/27872387/can-a-java-lambda-have-more-than-1-parameter</see>
@@ -111,10 +124,11 @@ public class Rand<T extends Object, RNG> {
      * @param mapper    (조합하는 함수, 연산식)
      * @return Rand<? extends Object, RNG> (조합된 결과)
      */
-    public Rand<?, RNG> map2(Rand<?, RNG> rb, BiFunction<T, T, ?> mapper) {
+    public Rand<?, RNG> map2(Rand<? extends Object, RNG> rb, BiFunction<T, T, ?> mapper) {
 
         LOG.debug("{}{} ---> {}", System.lineSeparator(), this.getNumber(), this.getNumber() instanceof BigInteger);
         LOG.debug("{}{} ---> {}", System.lineSeparator(), rb.getNumber(), rb.getNumber() instanceof BigInteger);
+        LOG.debug("{}{} ---> {}", System.lineSeparator(), rb.getNumber(), rb.getNumber() instanceof ConsList);
 
         try {
 
@@ -158,6 +172,67 @@ public class Rand<T extends Object, RNG> {
             LOG.error(e.getMessage());
             return new Rand<>(BigInteger.valueOf(-1L));
         }
-
     }
+
+    /**
+     * 위에 map2 를 간단히 하면 아래와 같은데...
+     * number 를 이용한 연산을 하면 java.lang.ClassCastException: java.lang.Double cannot be cast to java.math.BigInteger 발생
+     * 산술 연산은 타입의 영향을 받아서... 어쩔 수 없는 것인가...
+     * map3 를 만든 이유는 sequence 를 해결하기 위함이다.
+     * TODO map2 와 map3 로 나누지 않고도 동일한 동작이 가능하게 할 수 있는지 확인 필요...
+     *
+     * @param rb
+     * @param mapper
+     * @return
+     */
+    public Rand<?, RNG> map3(Rand<? extends Object, RNG> rb, BiFunction<T, T, ?> mapper) {
+        return new Rand<>(mapper.apply((T) this.getNumber(), (T) rb.getNumber()));
+    }
+
+    /**
+     * 두 개의 Rand 를 조합하여, A 와 B 의 쌍을 반환하는 함수
+     *
+     * @param   rb  (조합할 대상)
+     * @return  Rand<Pair<?, ?>, RNG> (RandA 와 RandB 쌍이 담긴 결과)
+     */
+    public Rand<Pair<T, T>, RNG> both(Rand<T, RNG> rb) {
+        Rand<Pair<T, T>, RNG> _both = (Rand<Pair<T, T>, RNG>) this.map2(rb, (t, t2) -> {
+            Pair<T, T> _temp = Pair.with(this.getNumber(), rb.getNumber());
+            return (T) _temp;
+        });
+        return _both;
+    }
+
+    /**
+     * random number 로 BigInteger 와 Double 값을 쌍으로 담아 반환하는 함수 (BigInteger, Double 순서)
+     *
+     * @return  Rand<Pair<BigInteger, Double>, RNG> (number 부분에 튜플이 들어가서 반환됨)
+     */
+    public Rand<Pair<BigInteger, Double>, RNG> randIntDouble() {
+        Rand<T, RNG> rb = (Rand<T, RNG>)((new Rand<Double, RNG>()).nextDouble());
+        Rand<Pair<T, T>, RNG> _both = this.both(rb);
+        return new Rand<>((Pair<BigInteger, Double>)_both.getNumber());
+    }
+
+    /**
+     * random number 로 Double 과 BigInteger 값을 쌍으로 담아 반환하는 함수 (Double, BigInteger 순서)
+     *
+     * @return  Rand<Pair<Double, BigInteger>, RNG> (number 부분에 튜플이 들어가서 반환됨)
+     */
+    public Rand<Pair<Double, BigInteger>, RNG> randDoubleInt() {
+        Rand<T,RNG> rb = (Rand<T, RNG>)((new Rand<BigInteger, RNG>()).nextInt());
+        Rand<Pair<T, T>, RNG> _both = this.both(rb);
+        return new Rand<>((Pair<Double, BigInteger>)_both.getNumber());
+    }
+
+    //연습문제 6.7
+    public Rand<ConsList<T>, RNG> sequence(ConsList<T> numbers) {
+        // 하나씩 우측에서 접어서 acc 에 옮겨 담고,
+        ConsList<T> acc = numbers.foldRight(Nil.getNil());
+        // 옮겨 담아진 것에 random number 를 붙이고
+        Rand<ConsList<T>, RNG> randB = new Rand<>(acc);
+        // 붙여서 완성된 ConsList 와 RNG 를 반환한다.
+        return (Rand<ConsList<T>, RNG>) this.map3(randB, (t, t2) -> ((ConsList)t2).append(ConsList.asList(t)));
+    }
+
 }

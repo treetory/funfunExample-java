@@ -33,6 +33,7 @@ public abstract class ConsList<T> extends AbstractList<T> {
 
         for (T t : a) {
             temp = new Cons<>(t, temp);
+            //LOG.debug("{}{} ---> {}", System.lineSeparator(), t, temp.toString());
         }
 
         return temp.reverse(Nil.getNil());
@@ -136,7 +137,7 @@ public abstract class ConsList<T> extends AbstractList<T> {
     }
 
     // 현재 아이템을 accumulator 에 붙이는 형식으로 구현... -> 사실 맞는건지 잘 모르겠다. 일단 결과는 원한대로 나왔으나...
-    private ConsList<T> append(ConsList<T> acc/*, ConsList<T> item*/) {
+    public ConsList<T> append(ConsList<T> acc/*, ConsList<T> item*/) {
         if (this instanceof Nil) {
             return acc;
         } else {
@@ -162,11 +163,13 @@ public abstract class ConsList<T> extends AbstractList<T> {
     // tail 이 Nil 이면, head 를 acc 에 담지 않는 방식으로 구현 -> tail 이 Nil 일 때까지 한번 가고, reverse 하면서 한번 더 순회
     public ConsList<T> foldRight(ConsList<T> acc) {
         ConsList<T> temp = acc;
+        temp = new Cons<>(this.head, acc);
+        acc = temp;
+        //LOG.debug("{}{} ---> {}", System.lineSeparator(), this.head, temp);
         if (this.tail() instanceof Nil) {
             return acc.reverse(Nil.getNil());
         } else {
-            temp = new Cons<>(this.head, acc);
-            return this.tail.foldRight(temp);
+            return this.tail.foldRight(acc);
         }
     }
 
