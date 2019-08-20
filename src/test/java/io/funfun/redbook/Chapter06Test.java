@@ -246,4 +246,61 @@ public class Chapter06Test {
         Rand<ConsList<Double>, RNG> seq = randA.sequence(ConsList.asList(1d, 2d, 3d, 4d, 5d, 6d));
         LOG.debug("{}{} ---> {}", System.lineSeparator(), seq.getNumber(), seq.getRng().getSeed());
     }
+
+    @Test
+    @DisplayName("[State] : Rand & NonNegativeLessThan")
+    void testNonNegativeLessThan() {
+        Rand<BigInteger, RNG> randA = new Rand<>();
+        Rand<BigInteger, RNG> randB = randA.nonNegativeLessThan1(6);
+        LOG.debug("{}{} ---> {}", System.lineSeparator(), randB.getNumber(), randB.getRng().getSeed());
+        Rand<BigInteger, RNG> randC = randB.nonNegativeLessThan2(2);
+        LOG.debug("{}{} ---> {}", System.lineSeparator(), randC.getNumber(), randC.getRng().getSeed());
+        Rand<BigInteger, RNG> randD = randC.nonNegativeLessThan3(10);
+        LOG.debug("{}{} ---> {}", System.lineSeparator(), randD.getNumber(), randD.getRng().getSeed());
+    }
+
+    @Test
+    @DisplayName("[State] : Rand & flatMap")
+    void testFlatMap() {
+        Rand<BigInteger, RNG> randA = new Rand<>();
+        Rand<BigInteger, RNG> randB = randA.flatMap(bigInteger -> bigInteger.divideAndRemainder(BigInteger.valueOf(100L))[1]);
+        LOG.debug("{}{} ---> {}", System.lineSeparator(), randB.getNumber(), randB.getRng().getSeed());
+        Rand<BigInteger, RNG> randC = randA.nonNegativeLessThanUsingFlatMap(100);
+        LOG.debug("{}{} ---> {}", System.lineSeparator(), randC.getNumber(), randC.getRng().getSeed());
+    }
+
+    @Test
+    @DisplayName("[State] : Rand & map using flatMap")
+    void testMap_usingFlatMap() {
+        Rand<BigInteger, RNG> randA = new Rand<>();
+        Rand<BigInteger, RNG> randB = randA.map(bigInteger -> bigInteger.divideAndRemainder(BigInteger.valueOf(200L))[1]);
+        LOG.debug("{}{} ---> {}", System.lineSeparator(), randB.getNumber(), randB.getRng().getSeed());
+        Rand<BigInteger, RNG> randC = randA.map_usingFlatMap(bigInteger -> bigInteger.divideAndRemainder(BigInteger.valueOf(200L))[1]);
+        LOG.debug("{}{} ---> {}", System.lineSeparator(), randC.getNumber(), randC.getRng().getSeed());
+    }
+
+    @Test
+    @DisplayName("[State] : Rand & map2 using flatMap")
+    void testMap2_usingFlatMap() {
+        Rand<BigInteger, RNG> randA = new Rand<>();
+        Rand<BigInteger, RNG> randB = randA.next();
+        Rand<BigInteger, RNG> randC = (Rand<BigInteger, RNG>) randA.map2(randB, (b1, b2) -> b1.multiply(b2));
+        LOG.debug("{}{} ---> {}", System.lineSeparator(), randC.getNumber(), randC.getRng().getSeed());
+        Rand<BigInteger, RNG> randD = randA.map2_usingFlatMap(randB, (b1, b2) -> b1.multiply(b2));
+        LOG.debug("{}{} ---> {}", System.lineSeparator(), randD.getNumber(), randD.getRng().getSeed());
+    }
+
+    @Test
+    @DisplayName("[State] : Rand & RollDice")
+    void testRollDice() {
+        Rand<BigInteger, RNG> randA = new Rand<>();
+        Rand<?, RNG> rolled = randA.rollDice();
+        for (int i=100; i > 0 ; i--) {
+            Rand<?, RNG> prev = rolled;
+            //rolled = prev.rollDice();
+            rolled = prev.rollDice2();
+            LOG.debug("{}{} ---> {}", System.lineSeparator(), rolled.getNumber(), rolled.getRng().getSeed());
+        }
+    }
+
 }

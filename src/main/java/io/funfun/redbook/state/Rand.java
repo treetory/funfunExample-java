@@ -1,6 +1,5 @@
 package io.funfun.redbook.state;
 
-import io.funfun.redbook.list.Cons;
 import io.funfun.redbook.list.ConsList;
 import io.funfun.redbook.list.Nil;
 import org.javatuples.Pair;
@@ -8,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -40,9 +38,9 @@ public class Rand<T extends Object, RNG> {
         this.rng = new SimpleRNG(init_seed);
     }
 
-    public Rand(T t, SimpleRNG rng) {
+    public Rand(T t, RNG rng) {
         this.number = t;
-        this.rng = rng;
+        this.rng = (SimpleRNG) rng;
     }
 
     /**
@@ -233,6 +231,101 @@ public class Rand<T extends Object, RNG> {
         Rand<ConsList<T>, RNG> randB = new Rand<>(acc);
         // 붙여서 완성된 ConsList 와 RNG 를 반환한다.
         return (Rand<ConsList<T>, RNG>) this.map3(randB, (t, t2) -> ((ConsList)t2).append(ConsList.asList(t)));
+    }
+
+    /**
+     * 아래 3가지는 map, map2 로는 잘 작성할 수 없는 함수의 예제이다
+     *
+     * @param   n (0이상 n미만의 정수 난수를 발생하기 위해 생성된 난수를 나누는 수)
+     * @return  Rand<T, RNG> (0이상 n미만의 난수와 생성기)
+     */
+    public Rand<T, RNG> nonNegativeLessThan1(int n) {
+        return this.map(t -> {
+            Integer _t = ((BigInteger) t)./*intValueExact()*/intValue();
+            Integer mod = _t % n;
+            return (T) BigInteger.valueOf(Long.parseLong(mod.toString()));
+        });
+    }
+
+    public Rand<T, RNG> nonNegativeLessThan2(int n) {
+        return this.map(t -> {
+            Integer _t = ((BigInteger) t)./*intValueExact()*/intValue();
+            Integer mod = _t % n;
+            return _t + (n-1) - mod >= 0 ? (T) BigInteger.valueOf(Long.parseLong(mod.toString())) : (T) this.getRng().nextInt().getValue0();
+        });
+    }
+
+    public Rand<T, RNG> nonNegativeLessThan3(int n) {
+        Pair<BigInteger, RNG> t = this.getRng().nonNegativeInt();
+        Integer _t = (t.getValue0())./*intValueExact()*/intValue();
+        Integer mod = _t % n;
+        Rand<T, RNG> result = new Rand<>((T) BigInteger.valueOf(Long.parseLong(mod.toString())), t.getValue1());
+        if (_t + (n-1) - mod >= 0) {
+            return result;
+        } else {
+            return result.nonNegativeLessThan3(n);
+        }
+    }
+
+    // 연습문제 6.8
+    /**
+     * flatMap 구현
+     *
+     * @param   mapper (연산)
+     * @return  Rand<T, RNG> (연산이 적용된 결과)
+     */
+    public Rand<T, RNG> flatMap(Function<T, T> mapper) {
+        return new Rand<>(mapper.apply(this.getNumber()), (RNG)this.getRng());
+    }
+
+    /**
+     * flatMap 을 이용하여 0이상 n 미만의 정수 반환하는 함수
+     *
+     * @param   n (나누는 수)
+     * @return  Rand<T, RNG> (0이상 n 미만의 정수와 난수 생성기)
+     */
+    public Rand<T, RNG> nonNegativeLessThanUsingFlatMap(int n) {
+        return this.flatMap(t -> (T)((BigInteger) t).divideAndRemainder(BigInteger.valueOf(Long.parseLong(Integer.valueOf(n).toString())))[1]);
+    }
+
+    // 연습문제 6.9
+    /**
+     * flatMap 을 이용하여 map 을 구현
+     *
+     * @param mapper
+     * @return
+     */
+    public Rand<T, RNG> map_usingFlatMap(Function<T, T> mapper) {
+        return this.flatMap(mapper);
+    }
+
+    /**
+     * flatMap 을 이용하여 map2 를 구현
+     *
+     * @param rb
+     * @param mapper
+     * @return
+     */
+    public Rand<T, RNG> map2_usingFlatMap(Rand<T, RNG> rb, BiFunction<T, T, T> mapper) {
+        return this.flatMap(t -> mapper.apply(t, rb.getNumber()));
+    }
+
+    /**
+     * 하나 모자라는 오류가 남아있는 주사위 굴리기 함수 (0~5가 반환됨)
+     *
+     * @return
+     */
+    public Rand<T, RNG> rollDice() {
+        return this.nonNegativeLessThan3(6);
+    }
+
+    /**
+     * 위 오류를 교정한 주사위 굴리기 함수 (1~6이 반환됨)
+     *
+     * @return
+     */
+    public Rand<T, RNG> rollDice2() {
+        return this.nonNegativeLessThan3(6).map(t -> (T)((BigInteger) t).add(BigInteger.ONE));
     }
 
 }
