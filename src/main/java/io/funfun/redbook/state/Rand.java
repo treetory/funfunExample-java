@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 public class Rand<T extends Object, RNG> {
 
-    public static final Logger LOG = LoggerFactory.getLogger(Rand.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Rand.class);
 
     private T number;
     private SimpleRNG rng;
@@ -50,10 +50,9 @@ public class Rand<T extends Object, RNG> {
      * @return  Rand<T, RNG> (T 는 인자로 넘겨받은 숫자)
      */
     public Rand<T, RNG> unit(T number) {
-        Rand<T, RNG> rand = new Rand<T, RNG>();
         this.number = number;
         //LOG.debug("{}RAND T : {} ---> {}", System.lineSeparator(), number, this.number);
-        return rand;
+        return this;
     }
 
     /**
